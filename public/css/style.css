@@ -7,7 +7,6 @@ body{
 .container {
   flex: 1;
 
-
 }
 
 .plus-jakarta-sans-ourFont {
@@ -119,7 +118,25 @@ body{
   padding-left: 0;
   padding-right: 0;
   border: none;
+  width: 60%;
+  max-width: 600px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
 }
+
+
+@media (max-width: 992px) {
+  .show-card {
+    width: 85%;
+  }
+}
+
+@media (max-width: 576px) {
+  .show-card {
+    width: 95%;
+  }
+}
+
 
 .btns {
   display: flex;
@@ -141,4 +158,23 @@ body{
   line-height: 1.5;
   border: none;
   font-size: 1rem;
+}
+.starability-result {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: clamp(0.9rem, 4vw, 1.5rem);
+}
+
+.starability-result > svg {
+  width: clamp(0.9rem, 4vw, 1.5rem);
+  height: clamp(0.9rem, 4vw, 1.5rem);
+}
+
+/*map*/
+#map { 
+  height:400px;
+  width: 80vh;
 }
