@@ -4,8 +4,6 @@ if (process.env.NODE_ENV !== "production"){
 
 
 
-
-
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
@@ -22,6 +20,7 @@ const listingRouter = require('./routes/listing.js');
 const reviewRouter = require('./routes/review.js');
 const userRouter = require('./routes/user.js');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
@@ -32,15 +31,15 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
 
-const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+
+const dbUrl = process.env.ATLASDB_URL;
 
 async function main() {
-    await mongoose.connect(MONGO_URL);
+    await mongoose.connect(dbUrl);
 }
 
 main()
@@ -50,8 +49,20 @@ main()
     console.error('Error connecting to MongoDB:', err);
   });
 
+  console.log("SESSION SECRET LOADED:", process.env.SESSION_SECRET);
+
+const store = MongoStore.create({
+  mongoUrl: dbUrl,
+  touchAfter: 24 * 3600,
+});
+
+store.on("error", (err) => {
+  console.log("Error in Mongo Session Store", err);
+});
+
 const sessionOptions = {
-    secret: "thisshouldbeabettersecret!",
+  store:store,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -61,10 +72,6 @@ const sessionOptions = {
     }
 };
 
-
-app.get("/", (req, res) => {
-    res.send("Hello World");
-});    
 
 app.use(session(sessionOptions));
 app.use(flash());
@@ -93,6 +100,9 @@ app.use((req, res, next) => {
 //     let registeredUser= await User.register(fakeUser, "demopassword");
 //     res.send("Demo user created!");
 // });
+app.get("/", (req, res) => {
+  res.redirect("/listings");
+});
 
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
@@ -103,9 +113,12 @@ app.all("*splat", (req,res,next)=>{
 });
 
 app.use((err, req, res, next) => {
-  let{statusCode=500, message = "Something went wrong~!"} = err;
-  // res.status(statusCode).send(message);
-  res.status(statusCode).render("error.ejs", { message});
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  const { statusCode = 500, message = "Something went wrong~!" } = err;
+  res.status(statusCode).render("error.ejs", { message });
 });
 
 app.listen(8080, () => {

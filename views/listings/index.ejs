@@ -1,23 +1,153 @@
 <% layout('layouts/boilerplate') %>
-<body>
-  <h1> All Listings</h1>
-  </form>
+<style>
+  #filters {
+    display: flex;
+    flex-direction: wrap;
+    margin-bottom: 1rem;
+    align-items: center;
+  }
+  .filter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .filter:hover {
+    background-color: #e9ecef;
+    cursor: pointer;
+  }
+  .filter p{
+    font-size: 0.6rem;
+  }
+  .tax-info {
+    /* font-size: 0.8rem;
+    color: #6c757d; */
+    display:none;
+  }
+  .tax-toggle{
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    height: 3.25rem; 
+    margin-left: 2rem;
+    display: flex;
+    align-items: center;
+  }
+</style>
 
-  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 g-4">
+  <div id="filters">
+    <div class="filter">
+      <div><i class="fa-solid fa-fire"></i></div>
+      <p>Trending</p>
+    </div>
+    <div class="filter">
+      <div><i class="fa-solid fa-bed"></i></div>
+      <p>Rooms</p>
+    </div>
+    <div class="filter">
+      <div><i class="fa-solid fa-mountain-city"></i></div>
+      <p>Cities</p>
+    </div>
+    <div class="filter">
+      <div><i class="fa-solid fa-mountain"></i></div>
+      <p>Mountain</p>
+    </div>
+    <div class="filter">
+      <div><i class="fa-brands fa-fort-awesome"></i></div>
+      <p>Castles</p>
+    </div>
+    <div class="filter">
+      <div><i class="fa-solid fa-person-swimming"></i></div>
+      <p>Pools</p>
+    </div>
+    <div class="filter">
+      <div><i class="fa-solid fa-campground"></i></div>
+      <p>Camping</p>
+    </div>
+    <div class="filter">
+      <div><i class="fa-solid fa-building-wheat"></i></div>
+      <p>Farms</p>
+    </div>
+    <div class="filter">
+      <div><i class="fa-solid fa-snowman"></i></div>
+      <p>Arctic</p>
+    </div>
+    <div class="filter">
+      <div><i class="fa-solid fa-building-wheat"></i></div>
+      <p>Farms</p>
+    </div>
+    <div class="filter">
+      <div><i class="fa-solid fa-fish-fins"></i></div>
+      <p>Pacific</p>
+    </div>
+    <div class="filter">
+      <div><i class="fa-solid fa-martini-glass-empty"></i></div>
+      <p>Nightlife</p>
+    </div>
+
+    <div class="tax-toggle">
+      <div class="form-check-reverse form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+        <label class="form-check-label" for="flexSwitchCheckDefault">
+          Display total after taxes</label>
+      </div>
+    </div>
+
+  </div>
+  <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
     <% for(let listing of allListings) { %>
       <a href="/listings/<%= listing._id %>" class="text-decoration-none text-dark">
         <div class="card listing-card col" >
-          <img src="<%=listing.image.url%>" class="card-img-top" alt="listing_image" style="height: 20rem;">
-          <div class="card-img-overlay"></div>
-          <div class="card-body">
-            <p class="card-text">
-              <b><%= listing.title %></b><br>
-                &#8377;<%= listing.price.toLocaleString("en-IN") %> / night<br>
-            </p>
-          </div>
+          <img src="<%= listing.image?.url || '/images/default-listing.jpg' %>" class="card-img-top" alt="listing_image" style="height: 20rem;">
+<div class="card-img-overlay"></div>
+<div class="card-body">
+  <p class="card-text">
+    <b><%= listing.title %></b><br>
+      &#8377;<%= (listing.price || 0).toLocaleString("en-IN") %> / night
+      <i id="tax-info"> &nbsp; &nbsp;+18% GST</i>
+      <br>
+  </p>
+</div>
         </div>
       </a>
     <% } %>
   </div>
-</body>
+
+
+<script>
+  const taxSwitch = document.getElementById('flexSwitchCheckDefault');
+  taxSwitch.addEventListener('click', ()=>{
+    let TaxInfo = document.getElementById('tax-info');
+    for(info of TaxInfo){
+      if(info.style.display != 'inline'){
+        info.style.display = 'inline';
+      } else {
+        info.style.display = 'none';
+      }
+    }
+
+    // const listingCards = document.querySelectorAll('.listing-card');
+    // listingCards.forEach(card => {
+    //   const priceText = card.querySelector('.card-text').innerHTML;
+    //   const priceMatch = priceText.match(/&#8377;([\d,]+)/);
+    //   if (priceMatch) {
+    //     let price = parseInt(priceMatch[1].replace(/,/g, ''));
+    //     if (this.checked) {
+    //       // Add 18% tax
+    //       price = Math.round(price * 1.18);
+    //     } else {
+    //       // Remove tax
+    //       price = Math.round(price / 1.18);
+    //     }
+    //     card.querySelector('.card-text').innerHTML = `<b>${card.querySelector('.card-text b').innerHTML}</b><br>&#8377;${price.toLocaleString("en-IN")} / night<br>`;
+      // }
+    // });
+  });  
+</script>
 
