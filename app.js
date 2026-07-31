@@ -13,7 +13,7 @@ const ejs = require('ejs');
 const methodOverride = require('method-override');
 const ejsMate = require('ejs-mate');
 // const wrapAsync = require("./utils/wrapAsync.js")
-const ExpressError = require("./utils/ExpressError.js")
+const ExpressError = require("./utils/expressError.js")
 // const {listingSchema, reviewSchema} =require("./schema.js")
 // const Review = require('./models/review.js');
 const listingRouter = require('./routes/listing.js');
@@ -49,7 +49,7 @@ main()
     console.error('Error connecting to MongoDB:', err);
   });
 
-  console.log("SESSION SECRET LOADED:", process.env.SESSION_SECRET);
+console.log("SESSION SECRET LOADED:", !!process.env.SESSION_SECRET);
 
 const store = MongoStore.create({
   mongoUrl: dbUrl,
@@ -121,6 +121,8 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error.ejs", { message });
 });
 
-app.listen(8080, () => {
-    console.log('Server is listening to port 8080');
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`);
 });
